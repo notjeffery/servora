@@ -59,9 +59,16 @@ export default function HomePage() {
     <div className="flex min-h-screen flex-col">
       {/* Header */}
       <header className="sticky top-0 z-20 border-b bg-white/90 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <Link href="/" className="text-xl font-bold tracking-wide">
-            SERVORA
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3">
+          <Link href="/" aria-label="SERVORA home" className="flex items-center">
+            <Image
+              src="/brand/logo.png"
+              alt="SERVORA"
+              width={640}
+              height={203}
+              priority
+              className="h-11 w-auto"
+            />
           </Link>
           <nav className="flex items-center gap-4 text-sm font-medium sm:gap-6">
             <a href="#services" className="hidden hover:underline sm:inline">
@@ -72,7 +79,7 @@ export default function HomePage() {
             </Link>
             <Link
               href="/pro/signup"
-              className="rounded-full border-2 border-orange-500 px-4 py-2 text-orange-600 transition-colors duration-200 hover:bg-orange-500 hover:text-white"
+              className="rounded-full border-2 border-brand-orange px-4 py-2 text-brand-orange transition-colors duration-200 hover:bg-brand-orange hover:text-white"
             >
               Become a Pro
             </Link>
@@ -90,8 +97,8 @@ export default function HomePage() {
           sizes="100vw"
           className="object-cover"
         />
-        <div className="absolute inset-0 bg-black/55" />
-        <div className="relative mx-auto flex h-full max-w-6xl flex-col justify-center px-6 text-white">
+        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/45 to-black/20" />
+        <div className="relative mx-auto flex h-full max-w-6xl flex-col justify-end px-6 pb-12 text-white md:pb-16">
           <h1 className="max-w-2xl text-4xl font-bold leading-tight md:text-6xl">
             Book trusted pros for any home job
           </h1>
@@ -200,8 +207,14 @@ export default function HomePage() {
 
       {/* Footer */}
       <footer className="border-t py-8 text-sm text-gray-600">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-2 px-6 md:flex-row">
-          <span className="font-semibold text-gray-900">SERVORA</span>
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 md:flex-row">
+          <Image
+            src="/brand/logo.png"
+            alt="SERVORA"
+            width={640}
+            height={203}
+            className="h-9 w-auto"
+          />
           <span>© {new Date().getFullYear()} SERVORA. All rights reserved.</span>
         </div>
       </footer>
