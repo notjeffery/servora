@@ -1,100 +1,209 @@
 import Image from "next/image";
+import Link from "next/link";
+import {
+  Search,
+  CalendarCheck,
+  CheckCircle2,
+  ShieldCheck,
+  BadgeDollarSign,
+  Star,
+} from "lucide-react";
+import HeroSearch from "@/components/home/HeroSearch";
 
-export default function Home() {
+const categories = [
+  { name: "Painting", image: "/images/cat-painting.jpg" },
+  { name: "Plumbing", image: "/images/cat-plumbing.jpg" },
+  { name: "HVAC", image: "/images/cat-hvac.jpg" },
+  { name: "Drywall", image: "/images/cat-drywall.jpg" },
+  { name: "General Construction", image: "/images/cat-construction.jpg" },
+];
+
+const steps = [
+  {
+    icon: Search,
+    title: "Choose a service",
+    text: "Pick a trade and tell us what you need done, where, and when.",
+  },
+  {
+    icon: CalendarCheck,
+    title: "Pick your pro",
+    text: "Compare profiles, reviews and upfront hourly rates, then send a booking request.",
+  },
+  {
+    icon: CheckCircle2,
+    title: "Get it done",
+    text: "Your pro confirms and shows up. Leave a review once the job is complete.",
+  },
+];
+
+const trust = [
+  {
+    icon: ShieldCheck,
+    title: "Licence-reviewed pros",
+    text: "Every pro's licence is reviewed by our team before their profile goes live.",
+  },
+  {
+    icon: BadgeDollarSign,
+    title: "Upfront hourly rates",
+    text: "See each pro's rate before you book. No bidding and no surprises.",
+  },
+  {
+    icon: Star,
+    title: "Verified reviews",
+    text: "Only customers who completed a booking can leave a review.",
+  },
+];
+
+export default function HomePage() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div className="flex min-h-screen flex-col">
+      {/* Header */}
+      <header className="sticky top-0 z-20 border-b bg-white/90 backdrop-blur">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+          <Link href="/" className="text-xl font-bold tracking-wide">
+            SERVORA
+          </Link>
+          <nav className="flex items-center gap-4 text-sm font-medium sm:gap-6">
+            <a href="#services" className="hidden hover:underline sm:inline">
+              Services
+            </a>
+            <Link href="/login" className="hover:underline">
+              Sign up / Log in
+            </Link>
+            <Link
+              href="/pro/signup"
+              className="rounded-full border-2 border-orange-500 px-4 py-2 text-orange-600 transition-colors duration-200 hover:bg-orange-500 hover:text-white"
+            >
+              Become a Pro
+            </Link>
+          </nav>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+      </header>
+
+      {/* Hero */}
+      <section className="relative h-[560px] md:h-[640px]">
+        <Image
+          src="/images/hero.jpg"
+          alt="A tradesperson at work"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover"
+        />
+        <div className="absolute inset-0 bg-black/55" />
+        <div className="relative mx-auto flex h-full max-w-6xl flex-col justify-center px-6 text-white">
+          <h1 className="max-w-2xl text-4xl font-bold leading-tight md:text-6xl">
+            Book trusted pros for any home job
+          </h1>
+          <p className="mt-4 max-w-xl text-lg text-gray-200">
+            Painters, plumbers, HVAC technicians and more. See the hourly
+            rate upfront, pick your pro, and book in minutes.
+          </p>
+          <div className="mt-8">
+            <HeroSearch />
+          </div>
+        </div>
+      </section>
+
+      {/* Categories */}
+      <section id="services" className="mx-auto w-full max-w-6xl px-6 py-16">
+        <h2 className="text-3xl font-bold">Popular services</h2>
+        <p className="mt-2 text-gray-600">Pick a trade to get started.</p>
+        <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-5">
+          {categories.map((c) => (
+            // TODO: point these at the browse page once it exists
+            <Link
+              key={c.name}
+              href="/signup"
+              className="group relative block aspect-[3/4] overflow-hidden rounded-xl"
+            >
+              <Image
+                src={c.image}
+                alt={c.name}
+                fill
+                sizes="(min-width: 768px) 20vw, 50vw"
+                className="object-cover transition-transform duration-300 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+              <span className="absolute bottom-3 left-3 right-3 font-semibold text-white">
+                {c.name}
+              </span>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* How it works */}
+      <section id="how-it-works" className="bg-gray-50 py-16">
+        <div className="mx-auto max-w-6xl px-6">
+          <h2 className="text-3xl font-bold">How it works</h2>
+          <div className="mt-8 grid gap-8 md:grid-cols-3">
+            {steps.map((s, i) => (
+              <div key={s.title}>
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-black text-white">
+                  <s.icon size={22} />
+                </div>
+                <h3 className="mt-4 text-lg font-semibold">
+                  {i + 1}. {s.title}
+                </h3>
+                <p className="mt-1 text-gray-600">{s.text}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Trust */}
+      <section className="mx-auto w-full max-w-6xl px-6 py-16">
+        <h2 className="text-3xl font-bold">Hire with confidence</h2>
+        <div className="mt-8 grid gap-8 md:grid-cols-3">
+          {trust.map((t) => (
+            <div key={t.title} className="rounded-xl border p-6">
+              <t.icon className="text-orange-500" size={28} />
+              <h3 className="mt-4 text-lg font-semibold">{t.title}</h3>
+              <p className="mt-1 text-gray-600">{t.text}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Pro CTA */}
+      <section className="bg-black text-white">
+        <div className="mx-auto grid max-w-6xl items-center gap-10 px-6 py-16 md:grid-cols-2">
+          <div className="relative aspect-[4/3] overflow-hidden rounded-xl">
+            <Image
+              src="/images/pro-cta.jpg"
+              alt="A tradesman next to his work van"
+              fill
+              sizes="(min-width: 768px) 50vw, 100vw"
+              className="object-cover"
+            />
+          </div>
+          <div>
+            <h2 className="text-3xl font-bold md:text-4xl">
+              Earn on your own schedule
+            </h2>
+            <p className="mt-4 text-gray-300">
+              Set your own hourly rate, choose the jobs you want, and get
+              booked by customers near you. Sign up, submit your licence,
+              and start receiving requests once you're approved.
+            </p>
+            <Link
+              href="/pro/signup"
+              className="mt-8 inline-block rounded-md bg-orange-500 px-6 py-3 font-semibold text-white hover:bg-orange-600"
+            >
+              Join as a pro
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="border-t py-8 text-sm text-gray-600">
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-2 px-6 md:flex-row">
+          <span className="font-semibold text-gray-900">SERVORA</span>
+          <span>© {new Date().getFullYear()} SERVORA. All rights reserved.</span>
+        </div>
       </footer>
     </div>
   );
