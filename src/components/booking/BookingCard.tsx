@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { MessageSquare } from "lucide-react";
 import Avatar from "@/components/ui/Avatar";
 import LocalTime from "@/components/ui/LocalTime";
 import BookingActions, {
@@ -74,11 +75,13 @@ export default function BookingCard({
   role,
   otherName,
   otherAvatar,
+  unread = 0,
 }: {
   booking: Booking;
   role: Role;
   otherName: string;
   otherAvatar: string | null;
+  unread?: number;
 }) {
   const category = one(booking.categories)?.name ?? "Service";
 
@@ -156,6 +159,19 @@ export default function BookingCard({
           {booking.decline_reason}
         </p>
       )}
+
+      <Link
+        href={`/messages/${booking.id}`}
+        className="mt-5 inline-flex items-center gap-2 rounded-full border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-800 transition-colors hover:bg-gray-50"
+      >
+        <MessageSquare size={16} />
+        Message {role === "customer" ? "pro" : "customer"}
+        {unread > 0 && (
+          <span className="rounded-full bg-brand-orange px-2 py-0.5 text-xs text-white">
+            {unread} new
+          </span>
+        )}
+      </Link>
 
       <BookingActions
         bookingId={booking.id}

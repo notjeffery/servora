@@ -64,6 +64,23 @@ export default async function CustomerDashboard({
     .eq("customer_id", user.id);
   const bookings = (data ?? []) as unknown as Booking[];
 
+  // Unread messages per booking
+  const unread = new Map<string, number>();
+  if (bookings.length > 0) {
+    const { data: unreadRows } = await supabase
+      .from("messages")
+      .select("booking_id")
+      .neq("sender_id", user.id)
+      .is("read_at", null)
+      .in(
+        "booking_id",
+        bookings.map((b) => b.id)
+      );
+    unreadRows?.forEach((r) =>
+      unread.set(r.booking_id, (unread.get(r.booking_id) ?? 0) + 1)
+    );
+  }
+
   // Names and photos of the pros on these bookings
   const proIds = Array.from(new Set(bookings.map((b) => b.pro_id)));
   const people = new Map<string, { name: string; avatar: string | null }>();
@@ -153,6 +170,7 @@ export default async function CustomerDashboard({
               role="customer"
               otherName={people.get(b.pro_id)?.name ?? "SERVORA Pro"}
               otherAvatar={people.get(b.pro_id)?.avatar ?? null}
+              unread={unread.get(b.id) ?? 0}
             />
           ))}
         </div>

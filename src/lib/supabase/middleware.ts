@@ -35,6 +35,7 @@ export async function updateSession(request: NextRequest) {
     path.startsWith("/dashboard") ||
     path.startsWith("/admin") ||
     path.startsWith("/book") ||
+    path.startsWith("/messages") ||
     path.startsWith("/pro/onboarding");
   const isAuthPage =
     path === "/login" || path === "/signup" || path === "/pro/signup";
