@@ -5,3 +5,10 @@ export function one<T>(value: Rel<T> | undefined): T | null {
   if (Array.isArray(value)) return value[0] ?? null;
   return value ?? null;
 }
+
+// Only allow redirects to paths inside our own site
+export function safeNext(next?: string): string | undefined {
+  return next && next.startsWith("/") && !next.startsWith("//")
+    ? next
+    : undefined;
+}

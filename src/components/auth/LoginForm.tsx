@@ -12,7 +12,7 @@ import {
   Label,
 } from "@/components/ui/form";
 
-export default function LoginForm() {
+export default function LoginForm({ next }: { next?: string }) {
   const router = useRouter();
   const supabase = createClient();
   const [email, setEmail] = useState("");
@@ -41,7 +41,7 @@ export default function LoginForm() {
       return;
     }
 
-    router.push("/dashboard");
+    router.push(next ?? "/dashboard");
     router.refresh();
   }
 
@@ -91,7 +91,10 @@ export default function LoginForm() {
         <span className="h-px flex-1 bg-gray-200" />
       </div>
 
-      <Link href="/signup" className={outlineButton}>
+      <Link
+        href={next ? `/signup?next=${encodeURIComponent(next)}` : "/signup"}
+        className={outlineButton}
+      >
         Sign up instead
       </Link>
     </form>

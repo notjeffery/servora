@@ -34,11 +34,23 @@ export async function updateSession(request: NextRequest) {
   const isProtected =
     path.startsWith("/dashboard") ||
     path.startsWith("/admin") ||
+    path.startsWith("/book") ||
     path.startsWith("/pro/onboarding");
+  const isAuthPage =
+    path === "/login" || path === "/signup" || path === "/pro/signup";
 
   if (!user && isProtected) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
+    url.search = "";
+    url.searchParams.set("next", path + request.nextUrl.search);
+    return NextResponse.redirect(url);
+  }
+
+  if (user && isAuthPage) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/dashboard";
+    url.search = "";
     return NextResponse.redirect(url);
   }
 
