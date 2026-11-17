@@ -5,11 +5,11 @@ import { useRouter } from "next/navigation";
 import { Search } from "lucide-react";
 
 const services = [
-  "Painting",
-  "Plumbing",
-  "HVAC",
-  "Drywall",
-  "General Construction",
+  { name: "Painting", slug: "painting" },
+  { name: "Plumbing", slug: "plumbing" },
+  { name: "HVAC", slug: "hvac" },
+  { name: "Drywall", slug: "drywall" },
+  { name: "General Construction", slug: "general-construction" },
 ];
 
 export default function HeroSearch() {
@@ -18,8 +18,16 @@ export default function HeroSearch() {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    // TODO: send to the browse page (with ?q=query) once it exists
-    router.push("/signup");
+    const q = query.trim().toLowerCase();
+    const match = q
+      ? services.find((s) => s.name.toLowerCase() === q) ??
+        services.find(
+          (s) =>
+            s.name.toLowerCase().includes(q) ||
+            q.includes(s.name.toLowerCase())
+        )
+      : undefined;
+    router.push(match ? `/services/${match.slug}` : "/services");
   }
 
   return (
@@ -38,13 +46,13 @@ export default function HeroSearch() {
       />
       <datalist id="service-options">
         {services.map((s) => (
-          <option key={s} value={s} />
+          <option key={s.slug} value={s.name} />
         ))}
       </datalist>
       <button
         type="submit"
         aria-label="Search"
-        className="flex items-center justify-center bg-orange-500 px-6 text-white transition-colors hover:bg-orange-600"
+        className="flex items-center justify-center bg-brand-orange px-6 text-white transition-colors hover:bg-brand-orange-dark"
       >
         <Search size={22} />
       </button>

@@ -23,6 +23,8 @@ type Props = {
   initialCategoryId?: string;
 };
 
+const AVATAR_TYPES = ["image/jpeg", "image/png", "image/webp"];
+
 export default function OnboardingForm({
   userId,
   categories,
@@ -31,6 +33,7 @@ export default function OnboardingForm({
   const router = useRouter();
   const supabase = createClient();
 
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [bio, setBio] = useState("");
   const [years, setYears] = useState("");
   const [city, setCity] = useState("");
@@ -69,6 +72,16 @@ export default function OnboardingForm({
     e.preventDefault();
     setError(null);
 
+    if (!avatarFile) {
+      return setError("Add a profile photo so customers can recognise you.");
+    }
+    if (!AVATAR_TYPES.includes(avatarFile.type)) {
+      return setError("Your profile photo must be a JPG, PNG or WebP image.");
+    }
+    if (avatarFile.size > 3 * 1024 * 1024) {
+      return setError("Your profile photo must be under 3 MB.");
+    }
+
     const selected = categories.filter((c) => c.id in rates);
     if (selected.length === 0) return setError("Pick at least one trade.");
 
@@ -104,7 +117,27 @@ export default function OnboardingForm({
     });
     if (profileErr) return fail(profileErr.message);
 
-    // 2. License document goes in the private bucket, under your own user id folder
+    // 2. Profile photo goes in the public avatars bucket, in your own folder
+    const ext =
+      (avatarFile.name.split(".").pop() || "jpg")
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, "") || "jpg";
+    const avatarPath = `${userId}/avatar-${Date.now()}.${ext}`;
+    const { error: avatarErr } = await supabase.storage
+      .from("avatars")
+      .upload(avatarPath, avatarFile, { contentType: avatarFile.type });
+    if (avatarErr) return fail(avatarErr.message);
+
+    const { data: pub } = supabase.storage
+      .from("avatars")
+      .getPublicUrl(avatarPath);
+    const { error: avatarProfileErr } = await supabase
+      .from("profiles")
+      .update({ avatar_url: pub.publicUrl })
+      .eq("id", userId);
+    if (avatarProfileErr) return fail(avatarProfileErr.message);
+
+    // 3. License document goes in the private bucket
     const safeName = licenseFile.name.replace(/[^a-zA-Z0-9._-]/g, "_");
     const path = `${userId}/${Date.now()}-${safeName}`;
     const { error: uploadErr } = await supabase.storage
@@ -112,7 +145,7 @@ export default function OnboardingForm({
       .upload(path, licenseFile);
     if (uploadErr) return fail(uploadErr.message);
 
-    // 3. Private license details
+    // 4. Private license details
     const { error: verErr } = await supabase.from("pro_verification").upsert({
       profile_id: userId,
       license_number: licenseNumber,
@@ -120,7 +153,7 @@ export default function OnboardingForm({
     });
     if (verErr) return fail(verErr.message);
 
-    // 4. Trades and rates (the database re-checks the min/max range)
+    // 5. Trades and rates (the database re-checks the min/max range)
     const { error: catErr } = await supabase.from("pro_categories").upsert(
       selected.map((c) => ({
         pro_id: userId,
@@ -149,6 +182,23 @@ export default function OnboardingForm({
 
       <section className="space-y-5">
         <h2 className={sectionTitle}>About you</h2>
+        <div>
+          <Label htmlFor="avatar" required>
+            Profile photo
+          </Label>
+          <input
+            id="avatar"
+            className={`${inputClass} !py-2 file:mr-4 file:rounded-full file:border-0 file:bg-brand-navy file:px-4 file:py-1.5 file:text-sm file:font-semibold file:text-white`}
+            type="file"
+            accept=".jpg,.jpeg,.png,.webp"
+            onChange={(e) => setAvatarFile(e.target.files?.[0] ?? null)}
+            required
+          />
+          <p className="mt-2 text-xs text-gray-500">
+            A clear photo of your face. JPG, PNG or WebP, up to 3 MB. This is
+            shown publicly on your profile.
+          </p>
+        </div>
         <div>
           <Label htmlFor="bio" required>
             Your bio

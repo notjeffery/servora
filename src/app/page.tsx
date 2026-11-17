@@ -9,13 +9,18 @@ import {
   Star,
 } from "lucide-react";
 import HeroSearch from "@/components/home/HeroSearch";
+import SiteHeader from "@/components/layout/SiteHeader";
 
 const categories = [
-  { name: "Painting", image: "/images/cat-painting.jpg" },
-  { name: "Plumbing", image: "/images/cat-plumbing.jpg" },
-  { name: "HVAC", image: "/images/cat-hvac.jpg" },
-  { name: "Drywall", image: "/images/cat-drywall.jpg" },
-  { name: "General Construction", image: "/images/cat-construction.jpg" },
+  { name: "Painting", slug: "painting", image: "/images/cat-painting.jpg" },
+  { name: "Plumbing", slug: "plumbing", image: "/images/cat-plumbing.jpg" },
+  { name: "HVAC", slug: "hvac", image: "/images/cat-hvac.jpg" },
+  { name: "Drywall", slug: "drywall", image: "/images/cat-drywall.jpg" },
+  {
+    name: "General Construction",
+    slug: "general-construction",
+    image: "/images/cat-construction.jpg",
+  },
 ];
 
 const steps = [
@@ -57,35 +62,7 @@ const trust = [
 export default function HomePage() {
   return (
     <div className="flex min-h-screen flex-col">
-      {/* Header */}
-      <header className="sticky top-0 z-20 border-b bg-white/90 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3">
-          <Link href="/" aria-label="SERVORA home" className="flex items-center">
-            <Image
-              src="/brand/logo.png"
-              alt="SERVORA"
-              width={640}
-              height={203}
-              priority
-              className="h-11 w-auto"
-            />
-          </Link>
-          <nav className="flex items-center gap-4 text-sm font-medium sm:gap-6">
-            <a href="#services" className="hidden hover:underline sm:inline">
-              Services
-            </a>
-            <Link href="/login" className="hover:underline">
-              Sign up / Log in
-            </Link>
-            <Link
-              href="/pro/signup"
-              className="rounded-full border-2 border-brand-orange px-4 py-2 text-brand-orange transition-colors duration-200 hover:bg-brand-orange hover:text-white"
-            >
-              Become a Pro
-            </Link>
-          </nav>
-        </div>
-      </header>
+      <SiteHeader />
 
       {/* Hero */}
       <section className="relative h-[560px] md:h-[640px]">
@@ -118,10 +95,9 @@ export default function HomePage() {
         <p className="mt-2 text-gray-600">Pick a trade to get started.</p>
         <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-5">
           {categories.map((c) => (
-            // TODO: point these at the browse page once it exists
             <Link
-              key={c.name}
-              href="/signup"
+              key={c.slug}
+              href={`/services/${c.slug}`}
               className="group relative block aspect-[3/4] overflow-hidden rounded-xl"
             >
               <Image
