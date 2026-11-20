@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { MessageSquare } from "lucide-react";
+import { MessageSquare, Star } from "lucide-react";
 import Avatar from "@/components/ui/Avatar";
 import LocalTime from "@/components/ui/LocalTime";
 import BookingActions, {
@@ -76,12 +76,14 @@ export default function BookingCard({
   otherName,
   otherAvatar,
   unread = 0,
+  reviewRating,
 }: {
   booking: Booking;
   role: Role;
   otherName: string;
   otherAvatar: string | null;
   unread?: number;
+  reviewRating?: number | null;
 }) {
   const category = one(booking.categories)?.name ?? "Service";
 
@@ -99,6 +101,8 @@ export default function BookingCard({
   const showReason =
     (booking.status === "declined" || booking.status === "cancelled") &&
     booking.decline_reason;
+
+  const canReview = role === "customer" && booking.status === "completed";
 
   return (
     <article className="rounded-2xl border p-5">
@@ -160,18 +164,47 @@ export default function BookingCard({
         </p>
       )}
 
-      <Link
-        href={`/messages/${booking.id}`}
-        className="mt-5 inline-flex items-center gap-2 rounded-full border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-800 transition-colors hover:bg-gray-50"
-      >
-        <MessageSquare size={16} />
-        Message {role === "customer" ? "pro" : "customer"}
-        {unread > 0 && (
-          <span className="rounded-full bg-brand-orange px-2 py-0.5 text-xs text-white">
-            {unread} new
-          </span>
-        )}
-      </Link>
+      <div className="mt-5 flex flex-wrap items-center gap-3">
+        <Link
+          href={`/messages/${booking.id}`}
+          className="inline-flex items-center gap-2 rounded-full border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-800 transition-colors hover:bg-gray-50"
+        >
+          <MessageSquare size={16} />
+          Message {role === "customer" ? "pro" : "customer"}
+          {unread > 0 && (
+            <span className="rounded-full bg-brand-orange px-2 py-0.5 text-xs text-white">
+              {unread} new
+            </span>
+          )}
+        </Link>
+
+        {canReview &&
+          (reviewRating ? (
+            <span className="flex items-center gap-2 text-sm text-gray-600">
+              Your rating:
+              <span className="flex">
+                {[1, 2, 3, 4, 5].map((n) => (
+                  <Star
+                    key={n}
+                    size={16}
+                    className={
+                      n <= reviewRating
+                        ? "fill-brand-orange text-brand-orange"
+                        : "text-gray-300"
+                    }
+                  />
+                ))}
+              </span>
+            </span>
+          ) : (
+            <Link
+              href={`/review/${booking.id}`}
+              className="rounded-full bg-brand-orange px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-orange-dark"
+            >
+              Leave a review
+            </Link>
+          ))}
+      </div>
 
       <BookingActions
         bookingId={booking.id}

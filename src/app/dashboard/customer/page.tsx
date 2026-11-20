@@ -81,6 +81,20 @@ export default async function CustomerDashboard({
     );
   }
 
+  // Ratings this customer has already left
+  const reviewed = new Map<string, number>();
+  const completedIds = bookings
+    .filter((b) => b.status === "completed")
+    .map((b) => b.id);
+  if (completedIds.length > 0) {
+    const { data: myReviews } = await supabase
+      .from("reviews")
+      .select("booking_id, rating")
+      .eq("reviewer_id", user.id)
+      .in("booking_id", completedIds);
+    myReviews?.forEach((r) => reviewed.set(r.booking_id, r.rating));
+  }
+
   // Names and photos of the pros on these bookings
   const proIds = Array.from(new Set(bookings.map((b) => b.pro_id)));
   const people = new Map<string, { name: string; avatar: string | null }>();
@@ -171,6 +185,7 @@ export default async function CustomerDashboard({
               otherName={people.get(b.pro_id)?.name ?? "SERVORA Pro"}
               otherAvatar={people.get(b.pro_id)?.avatar ?? null}
               unread={unread.get(b.id) ?? 0}
+              reviewRating={reviewed.get(b.id) ?? null}
             />
           ))}
         </div>

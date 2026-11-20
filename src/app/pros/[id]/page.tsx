@@ -15,12 +15,35 @@ type ProData = {
   city: string | null;
   state: string | null;
   created_at: string;
+  accepting_bookings: boolean;
   profiles: Rel<{ full_name: string; avatar_url: string | null }>;
   pro_categories: {
     hourly_rate: number;
     categories: Rel<{ id: string; name: string; slug: string }>;
   }[];
+  pro_availability: {
+    day_of_week: number;
+    start_time: string;
+    end_time: string;
+  }[];
 };
+
+const DAY_NAMES = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+];
+const DAY_ORDER = [1, 2, 3, 4, 5, 6, 0]; // Monday first
+
+function fmtTime(t: string) {
+  const [h, m] = t.split(":").map(Number);
+  const ampm = h >= 12 ? "PM" : "AM";
+  return `${h % 12 || 12}:${String(m).padStart(2, "0")} ${ampm}`;
+}
 
 export default async function ProProfilePage({
   params,
@@ -34,9 +57,10 @@ export default async function ProProfilePage({
   const { data } = await supabase
     .from("pro_profiles")
     .select(
-      `profile_id, bio, years_experience, city, state, created_at,
+      `profile_id, bio, years_experience, city, state, created_at, accepting_bookings,
        profiles ( full_name, avatar_url ),
-       pro_categories ( hourly_rate, categories ( id, name, slug ) )`
+       pro_categories ( hourly_rate, categories ( id, name, slug ) ),
+       pro_availability ( day_of_week, start_time, end_time )`
     )
     .eq("profile_id", params.id)
     .eq("verification_status", "approved")
@@ -51,14 +75,24 @@ export default async function ProProfilePage({
     .map((pc) => {
       const c = one(pc.categories);
       return c
-        ? { categoryId: c.id, name: c.name, slug: c.slug, rate: Number(pc.hourly_rate) }
+        ? {
+            categoryId: c.id,
+            name: c.name,
+            slug: c.slug,
+            rate: Number(pc.hourly_rate),
+          }
         : null;
     })
     .filter((t): t is NonNullable<typeof t> => t !== null);
 
+  const availability = DAY_ORDER.map((d) =>
+    pro.pro_availability.find((a) => a.day_of_week === d)
+  ).map((a, i) => (a ? { day: DAY_NAMES[DAY_ORDER[i]], a } : null))
+    .filter((x): x is NonNullable<typeof x> => x !== null);
+
   const { data: reviews } = await supabase
     .from("reviews")
-    .select("rating, comment, created_at")
+    .select("rating, comment, created_at, reviewer_name")
     .eq("reviewee_id", pro.profile_id)
     .order("created_at", { ascending: false })
     .limit(20);
@@ -125,6 +159,31 @@ export default async function ProProfilePage({
             </ul>
           </section>
 
+          {availability.length > 0 && (
+            <section>
+              <h2 className="text-xl font-bold text-brand-navy">
+                Usual availability
+              </h2>
+              <ul className="mt-3 divide-y rounded-2xl border">
+                {availability.map(({ day, a }) => (
+                  <li
+                    key={day}
+                    className="flex items-center justify-between px-5 py-3 text-sm"
+                  >
+                    <span className="font-medium">{day}</span>
+                    <span className="text-gray-700">
+                      {fmtTime(a.start_time)} – {fmtTime(a.end_time)}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-2 text-xs text-gray-500">
+                Times are in the pro&apos;s local time. Confirm the exact time
+                when you book.
+              </p>
+            </section>
+          )}
+
           <section>
             <h2 className="text-xl font-bold text-brand-navy">
               Reviews ({count})
@@ -160,10 +219,13 @@ export default async function ProProfilePage({
                       </span>
                     </div>
                     {r.comment && (
-                      <p className="mt-3 text-gray-700">{r.comment}</p>
+                      <p className="mt-3 whitespace-pre-line text-gray-700">
+                        {r.comment}
+                      </p>
                     )}
                     <p className="mt-2 text-xs text-gray-500">
-                      Verified customer
+                      {r.reviewer_name || "SERVORA customer"} · Verified
+                      customer
                     </p>
                   </li>
                 ))}
@@ -174,11 +236,31 @@ export default async function ProProfilePage({
 
         <aside>
           <div className="lg:sticky lg:top-24">
-            <BookingCard
-              proId={pro.profile_id}
-              trades={trades}
-              initialCategoryId={searchParams.category}
-            />
+            {pro.accepting_bookings ? (
+              <BookingCard
+                proId={pro.profile_id}
+                trades={trades}
+                initialCategoryId={searchParams.category}
+              />
+            ) : (
+              <div className="rounded-2xl border p-6 text-center shadow-sm">
+                <h2 className="text-lg font-bold text-brand-navy">
+                  Not taking bookings right now
+                </h2>
+                <p className="mt-2 text-sm text-gray-600">
+                  {name} has paused new requests. Check back soon, or browse
+                  other pros.
+                </p>
+                {trades[0] && (
+                  <Link
+                    href={`/services/${trades[0].slug}`}
+                    className="mt-4 inline-block font-semibold text-brand-orange underline"
+                  >
+                    Browse {trades[0].name.toLowerCase()} pros
+                  </Link>
+                )}
+              </div>
+            )}
           </div>
         </aside>
       </main>

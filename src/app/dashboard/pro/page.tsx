@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import SiteHeader from "@/components/layout/SiteHeader";
@@ -53,7 +54,7 @@ export default async function ProDashboard({
 
   const { data: pro } = await supabase
     .from("pro_profiles")
-    .select("verification_status, rejection_reason")
+    .select("verification_status, rejection_reason, accepting_bookings")
     .eq("profile_id", user.id)
     .maybeSingle();
   if (!pro) redirect("/pro/onboarding");
@@ -121,7 +122,23 @@ export default async function ProDashboard({
       <main className="mx-auto max-w-4xl space-y-6 px-6 py-10">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h1 className="text-3xl font-bold text-brand-navy">Your jobs</h1>
-          <SignOutButton />
+          <div className="flex flex-wrap items-center gap-3">
+            {pro.verification_status === "approved" && (
+              <Link
+                href={`/pros/${user.id}`}
+                className="text-sm font-semibold text-brand-orange underline"
+              >
+                View my profile
+              </Link>
+            )}
+            <Link
+              href="/dashboard/pro/profile"
+              className="rounded-full bg-brand-orange px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-orange-dark"
+            >
+              Edit profile
+            </Link>
+            <SignOutButton />
+          </div>
         </div>
 
         {pro.verification_status === "pending" && (
@@ -130,9 +147,21 @@ export default async function ProDashboard({
             booking requests once your license is approved.
           </div>
         )}
-        {pro.verification_status === "approved" && (
+        {pro.verification_status === "approved" && pro.accepting_bookings && (
           <div className="rounded-xl border border-green-300 bg-green-50 p-4 text-sm">
             You&apos;re approved. Customers can now find and book you.
+          </div>
+        )}
+        {pro.verification_status === "approved" && !pro.accepting_bookings && (
+          <div className="rounded-xl border border-gray-300 bg-gray-50 p-4 text-sm">
+            You&apos;re not taking new bookings right now, so customers can&apos;t
+            find you in the browse pages.{" "}
+            <Link
+              href="/dashboard/pro/profile"
+              className="font-semibold text-brand-orange underline"
+            >
+              Turn bookings back on
+            </Link>
           </div>
         )}
         {pro.verification_status === "rejected" && (

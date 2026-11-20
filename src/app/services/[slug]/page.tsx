@@ -46,12 +46,13 @@ export default async function ServicePage({
     .select(
       `hourly_rate,
        pro_profiles!inner (
-         profile_id, bio, years_experience, city, state, verification_status,
+         profile_id, bio, years_experience, city, state, verification_status, accepting_bookings,
          profiles ( full_name, avatar_url )
        )`
     )
     .eq("category_id", category.id)
-    .eq("pro_profiles.verification_status", "approved");
+    .eq("pro_profiles.verification_status", "approved")
+    .eq("pro_profiles.accepting_bookings", true);
   const rows = (data ?? []) as unknown as Row[];
 
   // Average ratings from verified reviews
